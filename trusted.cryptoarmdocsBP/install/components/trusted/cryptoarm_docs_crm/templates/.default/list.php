@@ -22,12 +22,35 @@ $APPLICATION->SetTitle(Loc::getMessage('TR_CA_DOCS_CRM_LIST_TITLE'));
 
 Loc::loadMessages($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/trusted.cryptoarmdocs/admin/trusted_cryptoarm_docs.php');
 
+if ($_POST['action_button_crm_docs_grid'] == 'delete') {
+    $filterOwner['OWNER'] = $USER->getId();
+    $docsDBUser = Docs\Database::getDocumentIdsByFilter(null, $filterOwner);
+
+    while ($docDBUser = $docsDBUser->Fetch()) {
+        $docsIdUser[] = $docDBUser['ID'];
+    }
+
+    foreach ($_POST['ID'] as $ID) {
+        if (array_search($ID, $docsIdUser) === false){
+            $idsUnshare['ids'][] = $ID;
+        } else {
+            $idsRemove['ids'][] = $ID;
+        }
+    }
+
+    if ($idsRemove)
+        Docs\AjaxCommand::remove($idsRemove);
+
+    if ($idsUnshare)
+        Docs\AjaxCommand::unshare($idsUnshare);
+}
+
 $schema = array(
     'GRID_ID' => 'crm_docs_grid',
-    'SHOW_PAGINATION' => false,
-    'SHOW_PAGESIZE' => false,
+    'SHOW_PAGINATION' => true,
+    'SHOW_PAGESIZE' => true,
     'SHOW_TOTAL_COUNTER' => false,
-    'ALLOW_SORT' => false,
+    'ALLOW_SORT' => true,
     'STRUCTURE' => array(
         'ID' => array(
             'NAME' => 'ID',
@@ -47,37 +70,72 @@ $schema = array(
             'NAME' => Loc::getMessage('TR_CA_DOCS_COL_SIGN'),
             'TYPE' => 'text',
             'DEFAULT' => true,
-            'SORT' => true,
-            'FILTER_TYPE' => 'text',
+            'SORT' => false,
+            // 'FILTER_TYPE' => 'text',
         ),
-        'STATUS' => array(
-            'NAME' => Loc::getMessage('TR_CA_DOCS_COL_STATUS'),
+        'TYPE' => array(
+            'NAME' => Loc::getMessage('TR_CA_DOCS_COL_TYPE'),
             'TYPE' => 'text',
             'DEFAULT' => true,
             'SORT' => true,
+            'FILTER_TYPE' => 'list',
+            'FILTER_ITEMS' => array(
+                Loc::getMessage("TR_CA_DOCS_TYPE_" . DOC_TYPE_FILE),
+                Loc::getMessage("TR_CA_DOCS_TYPE_" . DOC_TYPE_SIGNED_FILE),
+            ),
+            'FILTER_PARAMS' => array(
+                'multiple' => 'Y'
+            ),
+        ),
+        'OWNER' => array(
+            'NAME' => Loc::getMessage('TR_CA_DOCS_COL_OWNER'),
+            'TYPE' => 'user',
+            'DEFAULT' => true,
+            'SORT' => false,
+            'FILTER_TYPE' => 'dest_selector',
+            'FILTER_PARAMS' => array(
+                'apiVersion' => '3',
+                'context' => 'OWNER',
+                'contextCode' => 'U',
+                'enableAll' => 'N',
+                'enableSonetgroups' => 'N',
+                'allowEmailInvation' => 'N',
+                'allowSearchEmailUsers' => 'Y',
+                'departmentSelectDisable' => 'Y',
+                'isNumeric' => 'Y',
+                'prefix' => 'U',
+            ),
         ),
     ),
 );
 
 $gridBuilder = new Docs\GridBuilder($schema);
+$filter = ($gridBuilder->filter);
+$filter['SHARE_USER'] = $USER->getId();
+$sort = $gridBuilder->sort;
 
-// print_r($gridBuilder->filter);
-// print_r($gridBuilder->sort);
-// print_r($gridBuilder->pagination);
-$docs = Docs\Database::getDocumentsByUser($USER->GetID(), true);
+$rowsId = Docs\Database::getDocumentIdsByFilter($sort, $filter);
+
+$rowsId->NavStart($gridBuilder->pagination["nPageSize"]);
+$rowsId->bShowAll = true;
+$gridBuilder->navigation = $rowsId;
+
+while ($rowId = $rowsId->Fetch()) {
+    $docs[] = Docs\Database::getDocumentById($rowId['ID']);
+}
 
 $rows = array();
 
-foreach ($docs->getList() as $doc) {
+foreach ($docs as $doc) {
     $docId = $doc->getId();
-
     $signatures = $doc->getSignaturesToArray();
-
     $docStatus = $doc->getStatus();
+    $docIdOwner = $doc->getOwner();
+    $docOwner = Docs\Utils::getUserName($docIdOwner);
 
-    $docStatusString = Docs\Utils::GetTypeString($doc);
+    $docTypeString = Docs\Utils::GetTypeString($doc);
     if ($docStatus !== DOC_STATUS_NONE) {
-        $docStatusString .= '<br>' .
+        $docTypeString .= '<br>' .
             Loc::getMessage('TR_CA_DOCS_STATUS') .
             Docs\Utils::GetStatusString($doc);
     }
@@ -97,6 +155,21 @@ foreach ($docs->getList() as $doc) {
             'default' => true,
         );
     }
+
+    if ($doc->getType() === DOC_TYPE_SIGNED_FILE) {
+        $actions[] = array(
+            'text' => Loc::getMessage('TR_CA_DOCS_ACT_VERIFY'),
+            'onclick' => "trustedCA.verify([$docId])",
+            'default' => false,
+        );
+    }
+
+    $actions[] = array(
+        'text' => Loc::getMessage('TR_CA_DOCS_ACT_SEND_MAIL_TO'),
+        'onclick' => "trustedCA.promptAndSendEmail([$dockId], 'MAIL_EVENT_ID_TO', {}, 'MAIL_TEMPLATE_ID_TO')",
+        'default' => false,
+    );
+
     $actions[] = array(
         'text' => Loc::getMessage('TR_CA_DOCS_ACT_PROTOCOL'),
         'onclick' => "trustedCA.protocol($docId)",
@@ -133,12 +206,24 @@ foreach ($docs->getList() as $doc) {
             'MENU' => $startWorkflowActions
         );
     }
-
-    $actions[] = array(
-        'text' => Loc::getMessage('TR_CA_DOCS_ACT_REMOVE'),
-        'onclick' => "trustedCA.remove([$docId], false, {$gridBuilder->reloadGridJs})",
-        'default' => false,
-    );
+    if ($docIdOwner == $USER->GetID()) {
+        $actions[] = array(
+            'text' => Loc::getMessage('TR_CA_DOCS_ACT_SHARE_DOC'),
+            'onclick' => "trustedCA.promptAndShare([$docId],'SHARE_SIGN')",
+            'default' => false,
+        );
+        $actions[] = array(
+            'text' => Loc::getMessage('TR_CA_DOCS_ACT_REMOVE'),
+            'onclick' => "trustedCA.remove([$docId], false, {$gridBuilder->reloadGridJs})",
+            'default' => false,
+        );
+    } else {
+        $actions[] = array(
+            'text' => Loc::getMessage('TR_CA_DOCS_ACT_UNSHARE'),
+            'onclick' => "trustedCA.unshare([$docId], false, {$gridBuilder->reloadGridJs})",
+            'default' => false,
+        );
+    }
 
     $downloadJs = "trustedCA.download([$docId], true)";
     $docName = "<a style='cursor:pointer;' onclick='$downloadJs' ondblclick='event.stopPropagation()' title='" . Loc::getMessage('TR_CA_DOCS_DOWNLOAD_DOC') . "'>{$doc->getName()}</a>";
@@ -148,7 +233,8 @@ foreach ($docs->getList() as $doc) {
             'ID' => $docId,
             'NAME' => $docName,
             'SIGNATURES' => $doc->getSignaturesToTable(),
-            'STATUS' => $docStatusString,
+            'TYPE' => $docTypeString,
+            'OWNER' => $docOwner,
         ),
         'actions' => $actions,
     );
@@ -162,8 +248,9 @@ $onFailure = "() => { $('#tr_ca_upload_input').val(null) }";
 $accessFileJS = "() => { trustedCA.checkAccessFile(this.files[0], $onSuccess, $onFailure) }";
 $sizeFileJS = "trustedCA.checkFileSize(this.files[0], $maxSize, $accessFileJS, $onFailure)";
 ob_start();
+$gridBuilder->showFilter();
 ?>
-<form enctype="multipart/form-data" method="POST" id= "tr_ca_form_upload">
+<form enctype="multipart/form-data" method="POST" id= "tr_ca_form_upload" style="margin-left: 10px;">
     <div class="ui-btn ui-btn-primary ui-btn-icon-add crm-btn-toolbar-add tr_ca_upload_wrapper">
         <input class="tr_ca_upload_input" id= "tr_ca_upload_input" name="tr_ca_upload_comp_crm" type="file"
                onchange="<?= $sizeFileJS ?>">
@@ -177,143 +264,3 @@ $APPLICATION->AddViewContent('pagetitle', $output, 100);
 $reloadDoc = "trustedCA.reloadGrid('crm_docs_grid')";
 ?>
 <a id="trca-reload-doc" onclick="<?= $reloadDoc ?>"></a>
-
-<?
-/** @var array $arParams */
-/** @var array $arResult */
-/** @global CMain $APPLICATION */
-/** @global CUser $USER */
-/** @global CDatabase $DB */
-/** @var CBitrixComponentTemplate $this */
-/** @var string $templateName */
-/** @var string $templateFile */
-/** @var string $templateFolder */
-/** @var string $componentPath */
-/** @var CBitrixComponent $component */
-$this->setFrameMode(true);
-
-if(!$arResult["NavShowAlways"])
-{
-	if ($arResult["NavRecordCount"] == 0 || ($arResult["NavPageCount"] == 1 && $arResult["NavShowAll"] == false))
-		return;
-}
-
-$strNavQueryString = ($arResult["NavQueryString"] != "" ? $arResult["NavQueryString"]."&amp;" : "");
-$strNavQueryStringFull = ($arResult["NavQueryString"] != "" ? "?".$arResult["NavQueryString"] : "");
-?>
-
-<font class="text"><?=$arResult["NavTitle"]?> 
-
-<?if($arResult["bDescPageNumbering"] === true):?>
-
-	<?=$arResult["NavFirstRecordShow"]?> <?=GetMessage("nav_to")?> <?=$arResult["NavLastRecordShow"]?> <?=GetMessage("nav_of")?> <?=$arResult["NavRecordCount"]?><br /></font>
-
-	<font class="text">
-
-	<?if ($arResult["NavPageNomer"] < $arResult["NavPageCount"]):?>
-		<?if($arResult["bSavePage"]):?>
-			<a href="<?=$arResult["sUrlPath"]?>?<?=$strNavQueryString?>PAGEN_<?=$arResult["NavNum"]?>=<?=$arResult["NavPageCount"]?>"><?=GetMessage("nav_begin")?></a>
-			|
-			<a href="<?=$arResult["sUrlPath"]?>?<?=$strNavQueryString?>PAGEN_<?=$arResult["NavNum"]?>=<?=($arResult["NavPageNomer"]+1)?>"><?=GetMessage("nav_prev")?></a>
-			|
-		<?else:?>
-			<a href="<?=$arResult["sUrlPath"]?><?=$strNavQueryStringFull?>"><?=GetMessage("nav_begin")?></a>
-			|
-			<?if ($arResult["NavPageCount"] == ($arResult["NavPageNomer"]+1) ):?>
-				<a href="<?=$arResult["sUrlPath"]?><?=$strNavQueryStringFull?>"><?=GetMessage("nav_prev")?></a>
-				|
-			<?else:?>
-				<a href="<?=$arResult["sUrlPath"]?>?<?=$strNavQueryString?>PAGEN_<?=$arResult["NavNum"]?>=<?=($arResult["NavPageNomer"]+1)?>"><?=GetMessage("nav_prev")?></a>
-				|
-			<?endif?>
-		<?endif?>
-	<?else:?>
-		<?=GetMessage("nav_begin")?>&nbsp;|&nbsp;<?=GetMessage("nav_prev")?>&nbsp;|
-	<?endif?>
-
-	<?while($arResult["nStartPage"] >= $arResult["nEndPage"]):?>
-		<?$NavRecordGroupPrint = $arResult["NavPageCount"] - $arResult["nStartPage"] + 1;?>
-
-		<?if ($arResult["nStartPage"] == $arResult["NavPageNomer"]):?>
-			<b><?=$NavRecordGroupPrint?></b>
-		<?elseif($arResult["nStartPage"] == $arResult["NavPageCount"] && $arResult["bSavePage"] == false):?>
-			<a href="<?=$arResult["sUrlPath"]?><?=$strNavQueryStringFull?>"><?=$NavRecordGroupPrint?></a>
-		<?else:?>
-			<a href="<?=$arResult["sUrlPath"]?>?<?=$strNavQueryString?>PAGEN_<?=$arResult["NavNum"]?>=<?=$arResult["nStartPage"]?>"><?=$NavRecordGroupPrint?></a>
-		<?endif?>
-
-		<?$arResult["nStartPage"]--?>
-	<?endwhile?>
-
-	|
-
-	<?if ($arResult["NavPageNomer"] > 1):?>
-		<a href="<?=$arResult["sUrlPath"]?>?<?=$strNavQueryString?>PAGEN_<?=$arResult["NavNum"]?>=<?=($arResult["NavPageNomer"]-1)?>"><?=GetMessage("nav_next")?></a>
-		|
-		<a href="<?=$arResult["sUrlPath"]?>?<?=$strNavQueryString?>PAGEN_<?=$arResult["NavNum"]?>=1"><?=GetMessage("nav_end")?></a>
-	<?else:?>
-		<?=GetMessage("nav_next")?>&nbsp;|&nbsp;<?=GetMessage("nav_end")?>
-	<?endif?>
-
-<?else:?>
-
-	<?=$arResult["NavFirstRecordShow"]?> <?=GetMessage("nav_to")?> <?=$arResult["NavLastRecordShow"]?> <?=GetMessage("nav_of")?> <?=$arResult["NavRecordCount"]?><br /></font>
-
-	<font class="text">
-
-	<?if ($arResult["NavPageNomer"] > 1):?>
-
-		<?if($arResult["bSavePage"]):?>
-			<a href="<?=$arResult["sUrlPath"]?>?<?=$strNavQueryString?>PAGEN_<?=$arResult["NavNum"]?>=1"><?=GetMessage("nav_begin")?></a>
-			|
-			<a href="<?=$arResult["sUrlPath"]?>?<?=$strNavQueryString?>PAGEN_<?=$arResult["NavNum"]?>=<?=($arResult["NavPageNomer"]-1)?>"><?=GetMessage("nav_prev")?></a>
-			|
-		<?else:?>
-			<a href="<?=$arResult["sUrlPath"]?><?=$strNavQueryStringFull?>"><?=GetMessage("nav_begin")?></a>
-			|
-			<?if ($arResult["NavPageNomer"] > 2):?>
-				<a href="<?=$arResult["sUrlPath"]?>?<?=$strNavQueryString?>PAGEN_<?=$arResult["NavNum"]?>=<?=($arResult["NavPageNomer"]-1)?>"><?=GetMessage("nav_prev")?></a>
-			<?else:?>
-				<a href="<?=$arResult["sUrlPath"]?><?=$strNavQueryStringFull?>"><?=GetMessage("nav_prev")?></a>
-			<?endif?>
-			|
-		<?endif?>
-
-	<?else:?>
-		<?=GetMessage("nav_begin")?>&nbsp;|&nbsp;<?=GetMessage("nav_prev")?>&nbsp;|
-	<?endif?>
-
-	<?while($arResult["nStartPage"] <= $arResult["nEndPage"]):?>
-
-		<?if ($arResult["nStartPage"] == $arResult["NavPageNomer"]):?>
-			<b><?=$arResult["nStartPage"]?></b>
-		<?elseif($arResult["nStartPage"] == 1 && $arResult["bSavePage"] == false):?>
-			<a href="<?=$arResult["sUrlPath"]?><?=$strNavQueryStringFull?>"><?=$arResult["nStartPage"]?></a>
-		<?else:?>
-			<a href="<?=$arResult["sUrlPath"]?>?<?=$strNavQueryString?>PAGEN_<?=$arResult["NavNum"]?>=<?=$arResult["nStartPage"]?>"><?=$arResult["nStartPage"]?></a>
-		<?endif?>
-		<?$arResult["nStartPage"]++?>
-	<?endwhile?>
-	|
-
-	<?if($arResult["NavPageNomer"] < $arResult["NavPageCount"]):?>
-		<a href="<?=$arResult["sUrlPath"]?>?<?=$strNavQueryString?>PAGEN_<?=$arResult["NavNum"]?>=<?=($arResult["NavPageNomer"]+1)?>"><?=GetMessage("nav_next")?></a>&nbsp;|
-		<a href="<?=$arResult["sUrlPath"]?>?<?=$strNavQueryString?>PAGEN_<?=$arResult["NavNum"]?>=<?=$arResult["NavPageCount"]?>"><?=GetMessage("nav_end")?></a>
-	<?else:?>
-		<?=GetMessage("nav_next")?>&nbsp;|&nbsp;<?=GetMessage("nav_end")?>
-	<?endif?>
-
-<?endif?>
-
-
-<?if ($arResult["bShowAll"]):?>
-<noindex>
-	<?if ($arResult["NavShowAll"]):?>
-		|&nbsp;<a href="<?=$arResult["sUrlPath"]?>?<?=$strNavQueryString?>SHOWALL_<?=$arResult["NavNum"]?>=0" rel="nofollow"><?=GetMessage("nav_paged")?></a>
-	<?else:?>
-		|&nbsp;<a href="<?=$arResult["sUrlPath"]?>?<?=$strNavQueryString?>SHOWALL_<?=$arResult["NavNum"]?>=1" rel="nofollow"><?=GetMessage("nav_all")?></a>
-	<?endif?>
-</noindex>
-<?endif?>
-
-</font>

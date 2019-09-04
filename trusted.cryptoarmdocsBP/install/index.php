@@ -3,15 +3,10 @@ use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Config\Option;
 use Bitrix\Main\Application;
 use Bitrix\Main\ModuleManager;
-// use Bitrix\Main\EventManager;
-// use Bitrix\Main\Loader;
-// use Trusted\CryptoARM\Docs;
-
-require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/trusted.cryptoarmdocs/include.php';
 
 Loc::loadMessages(__FILE__);
 
-Class trusted_cryptoarmdocs_bitrix24 extends CModule
+Class trusted_cryptoarmdocsbp extends CModule
 {
     // Required by the marketplace standards
     var $MODULE_ID = "trusted.cryptoarmdocsBP";
@@ -208,16 +203,7 @@ Class trusted_cryptoarmdocs_bitrix24 extends CModule
         }
 
         if ($request["uninst"] === Loc::getMessage("MOD_UNINST_DEL")) {
-        // if ($step == 2) {
-
-            // $this->UnInstallModuleOptions();
-            // $deletedata = $request["deletedata"];
-            // if ($deletedata == "Y") {
-            //     $this->UnInstallDB();
-            //     $this->UnInstallIb();
-            // }
             self::UnInstallMenuItems();
-            // $this->UnInstallMailEvents();
             if (self::bizprocSupport()) {
                 self::UninstallBPTemplates();
             }
@@ -234,24 +220,8 @@ Class trusted_cryptoarmdocs_bitrix24 extends CModule
 
     function UnInstallFiles()
     {
-        // DeleteDirFilesEx("/bitrix/components/trusted/cryptoarm_docs_by_user/");
-        // DeleteDirFilesEx("/bitrix/components/trusted/cryptoarm_docs_by_order/");
         DeleteDirFilesEx("/bitrix/components/trusted/cryptoarm_docs_crm/");
-        // DeleteDirFilesEx("/bitrix/components/trusted/cryptoarm_docs_form/");
-        // DeleteDirFilesEx("/bitrix/components/trusted/cryptoarm_docs_upload/");
-        // DeleteDirFilesEx("/bitrix/components/trusted/docs/");
-        // DeleteDirFiles(
-        //     $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . $this->MODULE_ID . "/install/admin/",
-        //     $_SERVER["DOCUMENT_ROOT"] . "/bitrix/admin"
-        // );
-        // DeleteDirFilesEx("/bitrix/js/" . $this->MODULE_ID);
-        // DeleteDirFiles(
-        //     $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . $this->MODULE_ID . "/install/themes/.default/",
-        //     $_SERVER["DOCUMENT_ROOT"] . "/bitrix/themes/.default/"
-        // );
-        // DeleteDirFilesEx("/bitrix/themes/.default/icons/" . $this->MODULE_ID);
 
-        // CRM
         DeleteDirFilesEx("/tr_ca_docs/");
         DeleteDirFilesEx("/bitrix/activities/custom/trustedcasign/");
         DeleteDirFilesEx("/bitrix/activities/custom/trustedcaapprove/");
@@ -268,47 +238,6 @@ Class trusted_cryptoarmdocs_bitrix24 extends CModule
         return true;
     }
 
-    // function UnInstallModuleOptions()
-    // {
-    //     $options = array(
-    //         // 'DOCUMENTS_DIR',
-    //         'MAIL_EVENT_ID',
-    //         'MAIL_TEMPLATE_ID',
-    //         'MAIL_EVENT_ID_TO',
-    //         'MAIL_TEMPLATE_ID_TO',
-    //         'MAIL_EVENT_ID_SHARE',
-    //         'MAIL_TEMPLATE_ID_SHARE',
-    //         'MAIL_EVENT_ID_FORM',
-    //         'MAIL_TEMPLATE_ID_FORM',
-    //         'MAIL_EVENT_ID_FORM_TO_ADMIN',
-    //         'MAIL_TEMPLATE_ID_FORM_TO_ADMIN',
-    //     );
-    //     foreach ($options as $option) {
-    //         Option::delete(
-    //             $this->MODULE_ID,
-    //             array('name' => $option)
-    //         );
-    //     }
-    // }
-
-    // function UnInstallDB()
-    // {
-    //     global $DB;
-    //     if (Loader::includeModule('bizproc')) {
-    //         $docs = Docs\Database::getDocuments();
-    //         foreach ($docs->getList() as $doc) {
-    //             $doc->remove();
-    //         }
-    //     }
-    //     $sql = "DROP TABLE IF EXISTS `tr_ca_docs`";
-    //     $DB->Query($sql);
-    //     $sql = "DROP TABLE IF EXISTS `tr_ca_docs_property`";
-    //     $DB->Query($sql);
-    // }
-
-    // function UnInstallIb() {
-    //     Docs\IBlock::uninstall();
-    // }
 
     function UnInstallMenuItems() {
         $siteInfo = self::getSiteInfo();
@@ -322,49 +251,6 @@ Class trusted_cryptoarmdocs_bitrix24 extends CModule
         }
     }
 
-    // function UnInstallMailEvents()
-    // {
-    //     $events = array(
-    //         'TR_CA_DOCS_MAIL_BY_ORDER',
-    //         'TR_CA_DOCS_MAIL_TO',
-    //         'TR_CA_DOCS_MAIL_SHARE',
-    //         'TR_CA_DOCS_MAIL_FORM',
-    //         'TR_CA_DOCS_MAIL_FORM_TO_ADMIN',
-    //     );
-    //     foreach ($events as $event) {
-    //         $eventMessages = CEventMessage::GetList(
-    //             $by = 'id',
-    //             $order = 'desc',
-    //             array('TYPE' => $event)
-    //         );
-    //         $eventMessage = new CEventMessage;
-    //         while ($template = $eventMessages->Fetch()) {
-    //             $eventMessage->Delete((int)$template['ID']);
-    //         }
-    //         $eventType = new CEventType;
-    //         $eventType->Delete($event);
-    //     }
-    // }
-
-    // function dropDocumentChain($id)
-    // {
-    //     global $DB;
-    //     // Try to find parent doc
-    //     $sql = 'SELECT `PARENT_ID` FROM `tr_ca_docs` WHERE `ID`=' . $id;
-    //     $res = $DB->Query($sql)->Fetch();
-    //     $parentId = $res["PARENT_ID"];
-
-    //     $sql = 'DELETE FROM `tr_ca_docs`'
-    //         . 'WHERE ID = ' . $id;
-    //     $DB->Query($sql);
-    //     $sql = 'DELETE FROM `tr_ca_docs_property`'
-    //         . 'WHERE DOCUMENT_ID = ' . $id;
-    //     $DB->Query($sql);
-
-    //     if ($parentId) {
-    //         $this->dropDocumentChain($parentId);
-    //     }
-    // }
 
     function getSiteInfo() {
         $siteID = CSite::GetDefSite();
@@ -431,8 +317,8 @@ Class trusted_cryptoarmdocs_bitrix24 extends CModule
     }
 
     function ImportBPTemplateFromFile ($filename, $templatename) {
-        $file = fopen(TR_CA_DOCS_MODULE_DIR . "resources/".$filename, 'r');
-        $data = fread($file, filesize(TR_CA_DOCS_MODULE_DIR . "resources/".$filename));
+        $file = fopen($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/trusted.cryptoarmdocsBP/resources/".$filename, 'r');
+        $data = fread($file, filesize($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/trusted.cryptoarmdocsBP/resources/".$filename));
         fclose($file);
         $templateId = CBPWorkflowTemplateLoader::ImportTemplate(0, ["trusted.cryptoarmdocs", "Trusted\CryptoARM\Docs\WorkflowDocument", "TR_CA_DOC"], true, $templatename, "", $data);
         return $templateId;

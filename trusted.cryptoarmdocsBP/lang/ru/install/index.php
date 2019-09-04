@@ -5,7 +5,7 @@ $MESS["TR_CA_DOCS_MODULE_DESCRIPTION2"] = "Модуль работы с доку
 $MESS["TR_CA_DOCS_PARTNER_NAME"] = 'ООО "Цифровые технологии"';
 $MESS["TR_CA_DOCS_PARTNER_URI"] = "https://trusted.ru";
 
-$MESS["TR_CA_DOCS_CRM_MENU_TITLE"] = "КриптоАРМ Документы: бизнес-процессы";
+$MESS["TR_CA_DOCS_CRM_MENU_TITLE"] = "КриптоАРМ Документы";
 
 // email by order
 $MESS["TR_CA_DOCS_MAIL_EVENT_NAME"] = "КриптоАРМ Документы - рассылка документов по заказам";
