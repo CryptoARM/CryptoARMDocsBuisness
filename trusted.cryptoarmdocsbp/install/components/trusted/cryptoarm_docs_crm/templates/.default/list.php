@@ -152,7 +152,7 @@ foreach ($docs as $doc) {
         $actions[] = array(
             'text' => Loc::getMessage('TR_CA_DOCS_ACT_UNBLOCK'),
             'onclick' => "trustedCA.unblock([$docId], {$gridBuilder->reloadGridJs})",
-            'default' => true,
+            'default' => false,
         );
     }
 
