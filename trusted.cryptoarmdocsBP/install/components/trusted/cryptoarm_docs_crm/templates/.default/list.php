@@ -25,6 +25,7 @@ Loc::loadMessages($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/trusted.cryptoarm
 if ($_POST['action_button_crm_docs_grid'] == 'delete') {
     $filterOwner['OWNER'] = $USER->getId();
     $docsDBUser = Docs\Database::getDocumentIdsByFilter(null, $filterOwner);
+    $docsIdUser = array();
 
     while ($docDBUser = $docsDBUser->Fetch()) {
         $docsIdUser[] = $docDBUser['ID'];
