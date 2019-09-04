@@ -167,7 +167,7 @@ foreach ($docs as $doc) {
 
     $actions[] = array(
         'text' => Loc::getMessage('TR_CA_DOCS_ACT_SEND_MAIL_TO'),
-        'onclick' => "trustedCA.promptAndSendEmail([$dockId], 'MAIL_EVENT_ID_TO', {}, 'MAIL_TEMPLATE_ID_TO')",
+        'onclick' => "trustedCA.promptAndSendEmail([$docId], 'MAIL_EVENT_ID_TO', {}, 'MAIL_TEMPLATE_ID_TO')",
         'default' => false,
     );
 
