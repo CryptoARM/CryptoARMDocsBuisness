@@ -4,7 +4,7 @@ use Bitrix\Main\Loader;
 
 if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
-Loader::includeModule('trusted.cryptoarmdocs');
+Loader::includeModule('trusted.cryptoarmdocsbp');
 
 if (!Loader::includeModule('bizproc')) {
     return;
@@ -406,7 +406,6 @@ class CBPTrustedCAReview
 		global $USER;
 
 		$form = '';
-		Docs\Utils::dump($arTask);
 
 		if (!array_key_exists("ShowComment", $arTask["PARAMETERS"]) || ($arTask["PARAMETERS"]["ShowComment"] != "N"))
 		{

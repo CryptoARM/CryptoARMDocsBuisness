@@ -41,19 +41,5 @@ $APPLICATION->SetTitle(Loc::getMessage("TR_CA_DOCS_UNINSTALL_TITLE"));
         if ($found) {echo CAdminMessage::ShowMessage(Loc::getMessage("TR_CA_DOCS_UNINST_TEMPLATES")); }
     }
     ?>
-    <!-- <div style="border-top: 1px solid;
-                border-bottom: 1px solid;
-                border-color: #BDCADB;
-                margin: 16px 0;
-                display: inline-block;
-                padding: 15px 30px 15px 18px;">
-        <p>
-            <input type="checkbox" name="deletedata" id="deletedata" value="Y">
-            <label for="deletedata"><? //echo Loc::getMessage("TR_CA_DOCS_UNINST_DELETE_DATA") ?></label>
-        </p>
-        <p><? //echo nl2br(Loc::getMessage("TR_CA_DOCS_UNINST_SAVE_PROMPT")) ?></p>
-    </div> -->
-    <br/>
-    <input type="submit" name="choice" value="<?= Loc::getMessage("MOD_BACK") ?>">
     <input type="submit" name="uninst" value="<?= Loc::getMessage("MOD_UNINST_DEL") ?>">
 </form>

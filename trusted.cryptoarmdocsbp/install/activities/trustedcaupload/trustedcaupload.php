@@ -8,7 +8,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 global $APPLICATION;
 $APPLICATION->AddHeadScript("/bitrix/activities/custom/trustedcaupload/script.js");
 
-Loader::includeModule('trusted.cryptoarmdocs');
+Loader::includeModule('trusted.cryptoarmdocsbp');
 
 if (!Loader::includeModule('bizproc')) {
     return;

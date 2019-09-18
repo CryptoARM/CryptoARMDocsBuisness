@@ -27,10 +27,10 @@ include __DIR__ . "/version.php";
         elseif (!IsModuleInstalled('trusted.cryptoarmdocs')){
             echo CAdminMessage::ShowMessage(Loc::getMessage("TR_CA_DOCS_NO_CORE_MODULE"));
         }
-        elseif (!trusted_cryptoarmdocs_bitrix24::ModuleIsRelevant(ModuleManager::getVersion("trusted.cryptoarmdocs"), $arModuleVersion["VERSION"])) {
+        elseif (!trusted_cryptoarmdocsbp::ModuleIsRelevant(ModuleManager::getVersion("trusted.cryptoarmdocs"), $arModuleVersion["VERSION"])) {
             echo CAdminMessage::ShowMessage(Loc::getMessage("TR_CA_DOCS_UPDATE_CORE_MODULE") . intval($arModuleVersion["VERSION"]) . Loc::getMessage("TR_CA_DOCS_UPDATE_CORE_MODULE2"));
         }
-        elseif (!trusted_cryptoarmdocs_bitrix24::ModuleIsRelevant($arModuleVersion["VERSION"], ModuleManager::getVersion("trusted.cryptoarmdocs"))) {
+        elseif (!trusted_cryptoarmdocsbp::ModuleIsRelevant($arModuleVersion["VERSION"], ModuleManager::getVersion("trusted.cryptoarmdocs"))) {
             echo CAdminMessage::ShowMessage(Loc::getMessage("TR_CA_DOCS_UPDATE_MODULE"));
         }
         else {

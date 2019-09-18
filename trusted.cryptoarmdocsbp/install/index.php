@@ -3,15 +3,16 @@ use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Config\Option;
 use Bitrix\Main\Application;
 use Bitrix\Main\ModuleManager;
-
+use Trusted\CryptoARM\Docs;
 Loc::loadMessages(__FILE__);
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/trusted.cryptoarmdocs/include.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/trusted.cryptoarmdocsbp/include.php';
 
 
 Class trusted_cryptoarmdocsbp extends CModule
 {
     // Required by the marketplace standards
+    const MODULE_ID = "trusted.cryptoarmdocsbp";
     var $MODULE_ID = "trusted.cryptoarmdocsbp";
     var $MODULE_NAME;
     var $MODULE_DESCRIPTION;
@@ -47,12 +48,12 @@ Class trusted_cryptoarmdocsbp extends CModule
         //$request = $context->getRequest();
         //step = (int)$request["step"];
 
-        if (!$this->d7Support() || !$this->coreModuleInstalled()
-        || !$this->ModuleIsRelevant(ModuleManager::getVersion("trusted.cryptoarmdocs"), $arModuleVersion["VERSION"])
-        || !$this->ModuleIsRelevant($arModuleVersion["VERSION"], ModuleManager::getVersion("trusted.cryptoarmdocs"))) {
+        if (!self::d7Support() || !self::coreModuleInstalled()
+        || !self::ModuleIsRelevant(ModuleManager::getVersion("trusted.cryptoarmdocs"), $arModuleVersion["VERSION"])
+        || !self::ModuleIsRelevant($arModuleVersion["VERSION"], ModuleManager::getVersion("trusted.cryptoarmdocs"))) {
             $APPLICATION->IncludeAdminFile(
                 Loc::getMessage("MOD_INSTALL_TITLE"),
-                 $DOCUMENT_ROOT . "/bitrix/modules/" . $this->MODULE_ID . "/install/step_cancel.php"
+                 $DOCUMENT_ROOT . "/bitrix/modules/" . self::MODULE_ID . "/install/step_cancel.php"
             );
         }
 
@@ -66,7 +67,7 @@ Class trusted_cryptoarmdocsbp extends CModule
         //         $DOCUMENT_ROOT . "/bitrix/modules/" . $this->MODULE_ID . "/install/step1.php"
 
         //     );
-        //     Docs\Utils::dump($this->MODULE_ID);
+
         // }
         // if ($step == 2 && $continue) {
         //     $APPLICATION->IncludeAdminFile(
@@ -90,18 +91,19 @@ Class trusted_cryptoarmdocsbp extends CModule
         //             $this->dropDocumentChain($id);
         //         }
         //     }
-            $this->InstallFiles();
+
+        self::InstallFiles();
             //$this->CreateDocsDir();
             //$this->InstallModuleOptions();
             //$this->InstallDB();
             //$this->InstallIb();
-            $this->InstallMenuItems();
+            self::InstallMenuItems();
             //$this->InstallMailEvents();
-            if ($this->bizprocSupport()) {
-                $this->InstallBPTemplates();
-            }
+        if (self::bizprocSupport()) {
+            self::InstallBPTemplates();
+        }
 
-            ModuleManager::registerModule($this->MODULE_ID);
+        ModuleManager::registerModule(self::MODULE_ID);
 
         // if (!$continue) {
         //     $APPLICATION->IncludeAdminFile(
@@ -143,19 +145,19 @@ Class trusted_cryptoarmdocsbp extends CModule
     function InstallFiles()
     {
         CopyDirFiles(
-            $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . $this->MODULE_ID . "/install/components/",
+            $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . self::MODULE_ID . "/install/components/",
             $_SERVER["DOCUMENT_ROOT"] . "/bitrix/components/",
             true, true
         );
 
-        if ($this->bizprocSupport()) {
+        if (self::bizprocSupport()) {
             CopyDirFiles(
-                $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . $this->MODULE_ID . "/install/activities/",
+                $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . self::MODULE_ID . "/install/activities/",
                 $_SERVER["DOCUMENT_ROOT"] . "/bitrix/activities/custom/",
                 true, true
             );
             CopyDirFiles(
-                $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . $this->MODULE_ID . "/install/crm_pub/",
+                $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . self::MODULE_ID . "/install/crm_pub/",
                 $_SERVER["DOCUMENT_ROOT"],
                 true, true
             );
@@ -172,17 +174,16 @@ Class trusted_cryptoarmdocsbp extends CModule
     }
 
     function InstallMenuItems() {
-        $siteInfo = $this->getSiteInfo();
-
-        if ($this->crmSupport()) {
-            $this->AddMenuItem(
+        $siteInfo = self::getSiteInfo();
+        if (self::crmSupport()) {
+            self::AddMenuItem(
                 $siteInfo["DIR"] . ".top.menu.php",
                 array(
                     Loc::getMessage('TR_CA_DOCS_CRM_MENU_TITLE'),
                     $siteInfo["DIR"] . "tr_ca_docs/",
                     array(),
                     array(),
-                    "IsModuleInstalled('" . $this->MODULE_ID . "')"
+                    "IsModuleInstalled('" . self::MODULE_ID . "')"
                 ),
                 $siteInfo["LID"]
             );
@@ -201,7 +202,7 @@ Class trusted_cryptoarmdocsbp extends CModule
         if ($step < 2) {
             $APPLICATION->IncludeAdminFile(
                 Loc::getMessage("MOD_UNINSTALL_TITLE"),
-                $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . $this->MODULE_ID . "/install/unstep1.php"
+                $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . self::MODULE_ID . "/install/unstep1.php"
             );
         }
 
@@ -211,13 +212,11 @@ Class trusted_cryptoarmdocsbp extends CModule
                 self::UninstallBPTemplates();
             }
             self::UnInstallFiles();
-            ModuleManager::unRegisterModule('trusted.cryptoarmdocsbp');
+            ModuleManager::unRegisterModule(self::MODULE_ID);
             // $APPLICATION->IncludeAdminFile(
             //     Loc::getMessage("MOD_UNINSTALL_TITLE"),
             //     $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . $this->MODULE_ID . "/install/unstep2.php"
             // );
-        } else {
-            return false;
         }
     }
 
@@ -226,11 +225,10 @@ Class trusted_cryptoarmdocsbp extends CModule
         DeleteDirFilesEx("/bitrix/components/trusted/cryptoarm_docs_crm/");
 
         DeleteDirFilesEx("/tr_ca_docs/");
-        DeleteDirFilesEx("/bitrix/activities/custom/trustedcasign/");
-        DeleteDirFilesEx("/bitrix/activities/custom/trustedcaapprove/");
-        DeleteDirFilesEx("/bitrix/activities/custom/trustedcashare/");
-        DeleteDirFilesEx("/bitrix/activities/custom/trustedcaupload/");
-        DeleteDirFilesEx("/bitrix/activities/custom/trustedcareview/");
+        DeleteDirFiles(
+            $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . self::MODULE_ID . "/install/activities/",
+            $_SERVER["DOCUMENT_ROOT"] . "/bitrix/activities/custom/"
+        );
         CUrlRewriter::Delete(
             array(
                 'ID' => 'trusted:cryptoarm_docs_crm',
@@ -309,12 +307,12 @@ Class trusted_cryptoarmdocsbp extends CModule
         CModule::IncludeModule('bizprocdesigner');
 
         $templateIds = array();
-        $templateIds[] = $this->ImportBPTemplateFromFile('MoneyDemand.bpt', Loc::getMessage("TR_CA_DOCS_BP_MONEY_DEMAND"));
-        $templateIds[] = $this->ImportBPTemplateFromFile('Acquaintance.bpt', Loc::getMessage("TR_CA_DOCS_BP_ACQUAINTANCE"));
-        $templateIds[] = $this->ImportBPTemplateFromFile('SetSignResponsibility.bpt', Loc::getMessage("TR_CA_DOCS_BP_SIGN_TEMPLATE"));
-        $templateIds[] = $this->ImportBPTemplateFromFile('Order.bpt', Loc::getMessage("TR_CA_DOCS_BP_ORDER"));
-        $templateIds[] = $this->ImportBPTemplateFromFile('ServiceNote.bpt', Loc::getMessage("TR_CA_DOCS_BP_SERVICE_NOTE"));
-        $templateIds[] = $this->ImportBPTemplateFromFile('AgreedOn.bpt', Loc::getMessage("TR_CA_DOCS_BP_AGREED_TEMPLATE"));
+        $templateIds[] = self::ImportBPTemplateFromFile('MoneyDemand.bpt', Loc::getMessage("TR_CA_DOCS_BP_MONEY_DEMAND"));
+        $templateIds[] = self::ImportBPTemplateFromFile('Acquaintance.bpt', Loc::getMessage("TR_CA_DOCS_BP_ACQUAINTANCE"));
+        $templateIds[] = self::ImportBPTemplateFromFile('SetSignResponsibility.bpt', Loc::getMessage("TR_CA_DOCS_BP_SIGN_TEMPLATE"));
+        $templateIds[] = self::ImportBPTemplateFromFile('Order.bpt', Loc::getMessage("TR_CA_DOCS_BP_ORDER"));
+        $templateIds[] = self::ImportBPTemplateFromFile('ServiceNote.bpt', Loc::getMessage("TR_CA_DOCS_BP_SERVICE_NOTE"));
+        $templateIds[] = self::ImportBPTemplateFromFile('AgreedOn.bpt', Loc::getMessage("TR_CA_DOCS_BP_AGREED_TEMPLATE"));
 
         Option::set(TR_CA_DOCS_MODULE_ID, TR_CA_DOCS_TEMPLATE_ID, implode(" ", $templateIds));
     }
@@ -323,7 +321,7 @@ Class trusted_cryptoarmdocsbp extends CModule
         $file = fopen($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/trusted.cryptoarmdocsbp/resources/".$filename, 'r');
         $data = fread($file, filesize($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/trusted.cryptoarmdocsbp/resources/".$filename));
         fclose($file);
-        $templateId = CBPWorkflowTemplateLoader::ImportTemplate(0, ["trusted.cryptoarmdocs", "Trusted\CryptoARM\Docs\WorkflowDocument", "TR_CA_DOC"], true, $templatename, "", $data);
+        $templateId = CBPWorkflowTemplateLoader::ImportTemplate(0, ["trusted.cryptoarmdocsbp", "Trusted\CryptoARM\Docs\WorkflowDocument", "TR_CA_DOC"], true, $templatename, "", $data);
         return $templateId;
     }
 

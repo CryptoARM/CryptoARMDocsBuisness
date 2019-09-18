@@ -8,7 +8,7 @@ use Bitrix\Main\Config\Option;
 
 global $USER;
 
-Loader::includeModule('trusted.cryptoarmdocs');
+Loader::includeModule('trusted.cryptoarmdocsbp');
 
 if (!Docs\Utils::checkAuthorization()) {
     return;
