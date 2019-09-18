@@ -14,7 +14,7 @@ $aMenuLinks = array(
             "menu_item_id" => "menu_user",
             "counter_id" => "user",
         ),
-        "IsModuleInstalled('trusted.cryptoarmdocs')",
+        "IsModuleInstalled('trusted.cryptoarmdocsbp')",
     ),
     array(
         GetMessage("TR_CA_DOCS_CRM_MENU_WF"),
@@ -24,7 +24,7 @@ $aMenuLinks = array(
             "menu_item_id" => "menu_wf",
             "counter_id" => "wf",
         ),
-        "IsModuleInstalled('trusted.cryptoarmdocs')",
+        "IsModuleInstalled('trusted.cryptoarmdocsbp')",
     )
 );
 

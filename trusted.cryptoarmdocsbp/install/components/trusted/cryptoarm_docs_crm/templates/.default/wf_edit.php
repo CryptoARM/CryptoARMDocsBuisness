@@ -11,7 +11,9 @@ if (CModule::IncludeModuleEx('trusted.cryptoarmdocs') == MODULE_DEMO_EXPIRED) {
     return false;
 };
 
-Loader::includeModule('trusted.cryptoarmdocs');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/trusted.cryptoarmdocsbp/classes/WorkflowDocument.php';
+
+Loader::includeModule('trusted.cryptoarmdocsbp');
 
 $APPLICATION->SetTitle(Loc::getMessage('TR_CA_DOCS_WF_EDIT_TITLE'));
 
@@ -24,7 +26,7 @@ $APPLICATION->IncludeComponent(
     'bitrix:bizproc.workflow.edit',
     '',
     array(
-        'MODULE_ID' => 'trusted.cryptoarmdocs',
+        'MODULE_ID' => 'trusted.cryptoarmdocsbp',
         'ENTITY' => Docs\WorkflowDocument::class,
         'DOCUMENT_TYPE' => 'TR_CA_DOC',
         'ID' => (int)$arResult['VARIABLES']['WF_ID'],

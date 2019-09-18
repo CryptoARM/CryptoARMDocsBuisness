@@ -13,7 +13,8 @@ if (CModule::IncludeModuleEx('trusted.cryptoarmdocs') == MODULE_DEMO_EXPIRED) {
     return false;
 };
 
-Loader::includeModule('trusted.cryptoarmdocs');
+Loader::includeModule('trusted.cryptoarmdocsbp');
+// Loader::includeModule('trusted.cryptoarmdocs');
 CJSCore::Init('bp_starter');
 
 UI\Extension::load("ui.buttons.icons");
@@ -181,7 +182,7 @@ foreach ($docs as $doc) {
         $startWorkflowActions = array();
         foreach ($arResult['WORKFLOW_TEMPLATES'] as $workflowTemplate) {
             $starterParams = array(
-                'moduleId' => TR_CA_DOCS_MODULE_ID,
+                'moduleId' => TR_CA_DOCS_BP_MODULE_ID,
                 'entity' => Docs\WorkflowDocument::class,
                 'documentType' => 'TR_CA_DOC',
                 'documentId' => $docId,

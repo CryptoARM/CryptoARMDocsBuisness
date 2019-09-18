@@ -5,7 +5,7 @@ use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
 use Trusted\CryptoARM\Docs;
 
-Loader::includeModule('trusted.cryptoarmdocs');
+Loader::includeModule('trusted.cryptoarmdocsbp');
 
 class TrustedCACrmComponent extends CBitrixComponent
 {
