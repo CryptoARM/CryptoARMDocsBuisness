@@ -21,16 +21,18 @@ include __DIR__ . "/version.php";
     <input type="hidden" name="id" value="trusted.cryptoarmdocsbp">
     <input type="hidden" name="install" value="N">
     <?php
+        $res = trusted_cryptoarmdocsbp::CoreAndModuleAreCompatible();
+
         if (!CheckVersion(ModuleManager::getVersion("main"), "14.00.00")) {
             echo CAdminMessage::ShowMessage(Loc::getMessage("TR_CA_DOCS_NO_D7"));
         }
         elseif (!IsModuleInstalled('trusted.cryptoarmdocs')){
             echo CAdminMessage::ShowMessage(Loc::getMessage("TR_CA_DOCS_NO_CORE_MODULE"));
         }
-        elseif (!trusted_cryptoarmdocsbp::ModuleIsRelevant(ModuleManager::getVersion("trusted.cryptoarmdocs"), $arModuleVersion["VERSION"])) {
+        elseif ($res === "updateCore") {
             echo CAdminMessage::ShowMessage(Loc::getMessage("TR_CA_DOCS_UPDATE_CORE_MODULE") . intval($arModuleVersion["VERSION"]) . Loc::getMessage("TR_CA_DOCS_UPDATE_CORE_MODULE2"));
         }
-        elseif (!trusted_cryptoarmdocsbp::ModuleIsRelevant($arModuleVersion["VERSION"], ModuleManager::getVersion("trusted.cryptoarmdocs"))) {
+        elseif ($res === "updateModule") {
             echo CAdminMessage::ShowMessage(Loc::getMessage("TR_CA_DOCS_UPDATE_MODULE"));
         }
         else {
