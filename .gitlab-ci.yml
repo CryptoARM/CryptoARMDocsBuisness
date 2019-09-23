@@ -18,6 +18,7 @@ deploy_yellow:
   only:
     - web
   script:
+  - whoami
     - sudo rm -rf /var/www/yellow/bitrix/modules/trusted.cryptoarmdocsbp/
     - sudo cp -R trusted.cryptoarmdocsbp /var/www/yellow/bitrix/modules/
     - sudo chown -R vv:www-data /var/www/yellow/bitrix/modules/trusted.cryptoarmdocsbp/
