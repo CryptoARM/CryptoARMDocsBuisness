@@ -89,6 +89,10 @@ class WorkflowDocument implements \IBPWorkflowDocument {
         ];
     }
 
+    public static function getComplexDocumentId($id) {
+        return [TR_CA_DOCS_BP_MODULE_ID, self::class, $id];
+    }
+
     public static function getDocumentAdminPage($id) {
         $doc = Database::getDocumentById($id);
         if (!$doc) {
