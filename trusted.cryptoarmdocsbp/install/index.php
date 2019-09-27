@@ -44,71 +44,20 @@ Class trusted_cryptoarmdocsbp extends CModule
 
         include __DIR__ . "/version.php";
 
-        //$context = Application::getInstance()->getContext();
-        //$request = $context->getRequest();
-        //step = (int)$request["step"];
-
-        if (!self::d7Support() || !self::coreModuleInstalled() || self::CoreAndModuleAreCompatible() !== true ) {
+        if (!self::d7Support() || !self::coreModuleInstalled() || self::CoreAndModuleAreCompatible() !== "ok" ) {
             $APPLICATION->IncludeAdminFile(
                 Loc::getMessage("MOD_INSTALL_TITLE"),
                  $DOCUMENT_ROOT . "/bitrix/modules/" . self::MODULE_ID . "/install/step_cancel.php"
             );
-        }
-
-
-        // if ($request["choice"] == Loc::getMessage("TR_CA_DOCS_CANCEL_INSTALL")) {
-        //     $continue = false;
-        // }
-        // if ($step < 2 && $continue) {
-        //     $APPLICATION->IncludeAdminFile(
-        //         Loc::getMessage("MOD_INSTALL_TITLE"),
-        //         $DOCUMENT_ROOT . "/bitrix/modules/" . $this->MODULE_ID . "/install/step1.php"
-
-        //     );
-
-        // }
-        // if ($step == 2 && $continue) {
-        //     $APPLICATION->IncludeAdminFile(
-        //         Loc::getMessage("MOD_INSTALL_TITLE"),
-        //         $DOCUMENT_ROOT . "/bitrix/modules/" . $this->MODULE_ID . "/install/step2.php"
-        //     );
-        // }
-        // if ($step == 3 && $continue) {
-        //     $APPLICATION->IncludeAdminFile(
-        //         Loc::getMessage("MOD_INSTALL_TITLE"),
-        //         $DOCUMENT_ROOT . "/bitrix/modules/" . $this->MODULE_ID . "/install/step3.php"
-        //     );
-        // }
-        // if ($step == 4 && $continue) {
-        //     if ($request["dropDB"] == "Y") {
-        //         $this->UnInstallDB();
-        //         $this->UnInstallIb();
-        //     } elseif ($request["dropLostDocs"]) {
-        //         $lostDocs = unserialize($request["dropLostDocs"]);
-        //         foreach ($lostDocs as $id) {
-        //             $this->dropDocumentChain($id);
-        //         }
-        //     }
+        };
 
         self::InstallFiles();
-            //$this->CreateDocsDir();
-            //$this->InstallModuleOptions();
-            //$this->InstallDB();
-            //$this->InstallIb();
-            self::InstallMenuItems();
-            //$this->InstallMailEvents();
+        self::InstallMenuItems();
         if (self::bizprocSupport()) {
             self::InstallBPTemplates();
         }
 
         ModuleManager::registerModule(self::MODULE_ID);
-
-        // if (!$continue) {
-        //     $APPLICATION->IncludeAdminFile(
-        //         Loc::getMessage("MOD_INSTALL_TITLE"),
-        //         $DOCUMENT_ROOT . "/bitrix/modules/" . $this->MODULE_ID . "/install/step_cancel.php"
-        //     );
-        // }
     }
 
     function d7Support()
@@ -140,7 +89,7 @@ Class trusted_cryptoarmdocsbp extends CModule
             $res = "updateCore";
         } elseif (intval($moduleVersion[0])<intval($coreVersion[0])) {
             $res = "updateModule";
-        } else $res = true;
+        } else $res = "ok";
 
         return $res;
     }
