@@ -110,6 +110,11 @@ Class trusted_cryptoarmdocsbp extends CModule
                 true, true
             );
             CopyDirFiles(
+                $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . self::MODULE_ID . "/install/admin/",
+                $_SERVER["DOCUMENT_ROOT"] . "/bitrix/admin/",
+                true, false
+            );
+            CopyDirFiles(
                 $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . self::MODULE_ID . "/install/crm_pub/",
                 $_SERVER["DOCUMENT_ROOT"],
                 true, true
