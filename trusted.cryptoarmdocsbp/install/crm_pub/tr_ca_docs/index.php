@@ -9,10 +9,6 @@ use Bitrix\Main\ModuleManager;
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/trusted.cryptoarmdocsbp/install/index.php';
 
-if (CModule::IncludeModuleEx('trusted.cryptoarmdocs') == MODULE_DEMO_EXPIRED) {
-    echo GetMessage("TR_CA_DOCS_MODULE_DEMO_EXPIRED");
-    return false;
-};
 if (!trusted_cryptoarmdocsbp::coreModuleInstalled()) {
     echo ShowMessage(Loc::getMessage("TR_CA_DOCS_NO_CORE_MODULE"));
     return false;
@@ -28,6 +24,12 @@ switch (trusted_cryptoarmdocsbp::CoreAndModuleAreCompatible()) {
         break;
     default:break;
 };
+Loader::includeModule('trusted.cryptoarmdocsbp');
+if (CModule::IncludeModuleEx(TR_CA_DOCS_CORE_MODULE) == MODULE_DEMO_EXPIRED) {
+    echo GetMessage("TR_CA_DOCS_MODULE_DEMO_EXPIRED");
+    return false;
+};
+
 
 if ($USER->IsAuthorized()) {
 

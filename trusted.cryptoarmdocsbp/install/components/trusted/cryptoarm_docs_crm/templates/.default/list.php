@@ -8,20 +8,19 @@ use Bitrix\Main\UI;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Web\Json;
 
-if (CModule::IncludeModuleEx('trusted.cryptoarmdocs') == MODULE_DEMO_EXPIRED) {
+Loader::includeModule('trusted.cryptoarmdocsbp');
+if (CModule::IncludeModuleEx(TR_CA_DOCS_CORE_MODULE) == MODULE_DEMO_EXPIRED) {
     echo GetMessage("TR_CA_DOCS_MODULE_DEMO_EXPIRED");
     return false;
 };
 
-Loader::includeModule('trusted.cryptoarmdocsbp');
-// Loader::includeModule('trusted.cryptoarmdocs');
 CJSCore::Init('bp_starter');
 
 UI\Extension::load("ui.buttons.icons");
 
 $APPLICATION->SetTitle(Loc::getMessage('TR_CA_DOCS_CRM_LIST_TITLE'));
 
-Loc::loadMessages($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/trusted.cryptoarmdocs/admin/trusted_cryptoarm_docs.php');
+Loc::loadMessages($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/' . TR_CA_DOCS_CORE_MODULE . '/admin/trusted_cryptoarm_docs.php');
 
 if ($_POST['action_button_crm_docs_grid'] == 'delete') {
     $filterOwner['OWNER'] = $USER->getId();
