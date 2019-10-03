@@ -22,7 +22,7 @@ $APPLICATION->SetTitle(Loc::getMessage("TR_CA_DOCS_UNINSTALL_TITLE"));
     <?
     //check on active workflows, based on installed Cryptoarm templates. Sends warning, if founds some
     if (IsModuleInstalled("bizproc")) {
-        $templateIds = preg_split('/ /', Option::get(TR_CA_DOCS_MODULE_ID, TR_CA_DOCS_TEMPLATE_ID), null, PREG_SPLIT_NO_EMPTY);
+        $templateIds = preg_split('/ /', Option::get(TR_CA_DOCS_BP_MODULE_ID, TR_CA_DOCS_TEMPLATE_ID), null, PREG_SPLIT_NO_EMPTY);
         global $DB;
         $found = false;
         foreach ($templateIds as $id) {

@@ -6,14 +6,11 @@ use Trusted\CryptoARM\Docs;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
 
-if (CModule::IncludeModuleEx("trusted.cryptoarmdocs") == MODULE_DEMO_EXPIRED) {
+Loader::includeModule('trusted.cryptoarmdocsbp');
+if (CModule::IncludeModuleEx(TR_CA_DOCS_CORE_MODULE) == MODULE_DEMO_EXPIRED) {
     echo GetMessage("TR_CA_DOCS_MODULE_DEMO_EXPIRED");
     return false;
 };
-
-require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/trusted.cryptoarmdocsbp/classes/WorkflowDocument.php';
-
-Loader::includeModule("trusted.cryptoarmdocsbp");
 
 $APPLICATION->SetTitle(Loc::getMessage('TR_CA_DOCS_WF_LIST_TITLE'));
 

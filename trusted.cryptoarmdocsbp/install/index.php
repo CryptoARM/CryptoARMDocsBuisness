@@ -8,7 +8,6 @@ Loc::loadMessages(__FILE__);
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/trusted.cryptoarmdocsbp/include.php';
 
-
 Class trusted_cryptoarmdocsbp extends CModule
 {
     // Required by the marketplace standards
@@ -56,7 +55,6 @@ Class trusted_cryptoarmdocsbp extends CModule
         if (self::bizprocSupport()) {
             self::InstallBPTemplates();
         }
-
         ModuleManager::registerModule(self::MODULE_ID);
     }
 
@@ -77,13 +75,13 @@ Class trusted_cryptoarmdocsbp extends CModule
 
     function coreModuleInstalled()
     {
-        return IsModuleInstalled("trusted.cryptoarmdocs");
+        return IsModuleInstalled(TR_CA_DOCS_CORE_MODULE);
     }
 
     function CoreAndModuleAreCompatible()
     {
         include __DIR__ . "/version.php";
-        $coreVersion = explode(".", ModuleManager::getVersion("trusted.cryptoarmdocs"));
+        $coreVersion = explode(".", ModuleManager::getVersion(TR_CA_DOCS_CORE_MODULE));
         $moduleVersion = explode(".", $arModuleVersion["VERSION"]);
         if (intval($moduleVersion[0])>intval($coreVersion[0])) {
             $res = "updateCore";
@@ -171,10 +169,6 @@ Class trusted_cryptoarmdocsbp extends CModule
             }
             self::UnInstallFiles();
             ModuleManager::unRegisterModule(self::MODULE_ID);
-            // $APPLICATION->IncludeAdminFile(
-            //     Loc::getMessage("MOD_UNINSTALL_TITLE"),
-            //     $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . $this->MODULE_ID . "/install/unstep2.php"
-            // );
         }
     }
 
@@ -272,7 +266,7 @@ Class trusted_cryptoarmdocsbp extends CModule
         $templateIds[] = self::ImportBPTemplateFromFile('ServiceNote.bpt', Loc::getMessage("TR_CA_DOCS_BP_SERVICE_NOTE"));
         $templateIds[] = self::ImportBPTemplateFromFile('AgreedOn.bpt', Loc::getMessage("TR_CA_DOCS_BP_AGREED_TEMPLATE"));
 
-        Option::set(TR_CA_DOCS_MODULE_ID, TR_CA_DOCS_TEMPLATE_ID, implode(" ", $templateIds));
+        Option::set(TR_CA_DOCS_BP_MODULE_ID, TR_CA_DOCS_TEMPLATE_ID, implode(" ", $templateIds));
     }
 
     function ImportBPTemplateFromFile ($filename, $templatename) {
@@ -284,7 +278,7 @@ Class trusted_cryptoarmdocsbp extends CModule
     }
 
     function UninstallBPTemplates () {
-        $templateIds = preg_split('/ /', Option::get(TR_CA_DOCS_MODULE_ID, TR_CA_DOCS_TEMPLATE_ID), null, PREG_SPLIT_NO_EMPTY);
+        $templateIds = preg_split('/ /', Option::get(TR_CA_DOCS_BP_MODULE_ID, TR_CA_DOCS_TEMPLATE_ID), null, PREG_SPLIT_NO_EMPTY);
         global $DB;
         foreach ($templateIds as $id) {
             $dbResult = $DB->Query(

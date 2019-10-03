@@ -26,7 +26,7 @@ include __DIR__ . "/version.php";
         if (!CheckVersion(ModuleManager::getVersion("main"), "14.00.00")) {
             echo CAdminMessage::ShowMessage(Loc::getMessage("TR_CA_DOCS_NO_D7"));
         }
-        elseif (!IsModuleInstalled('trusted.cryptoarmdocs')){
+        elseif (!trusted_cryptoarmdocsbp::coreModuleInstalled()){
             echo CAdminMessage::ShowMessage(Loc::getMessage("TR_CA_DOCS_NO_CORE_MODULE"));
         }
         elseif ($res === "updateCore") {
