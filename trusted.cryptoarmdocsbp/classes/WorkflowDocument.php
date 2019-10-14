@@ -6,7 +6,9 @@ use Bitrix\Main\GroupTable;
 use Bitrix\Main\Loader;
 
 Loader::includeModule('trusted.cryptoarmdocsbp');
-Loader::includeModule(TR_CA_DOCS_CORE_MODULE);
+if (isModuleInstalled(TR_CA_DOCS_CORE_MODULE)) {
+    Loader::includeModule(TR_CA_DOCS_CORE_MODULE);
+}
 
 if (!Loader::IncludeModule('bizproc')) {
     return;
