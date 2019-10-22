@@ -127,120 +127,121 @@ while ($rowId = $rowsId->Fetch()) {
 
 $rows = array();
 
-foreach ($docs as $doc) {
-    $docId = $doc->getId();
-    $signatures = $doc->getSignaturesToArray();
-    $docStatus = $doc->getStatus();
-    $docIdOwner = $doc->getOwner();
-    $docOwner = Docs\Utils::getUserName($docIdOwner);
+if (is_array($docs)){
+    foreach ($docs as $doc) {
+        $docId = $doc->getId();
+        $signatures = $doc->getSignaturesToArray();
+        $docStatus = $doc->getStatus();
+        $docIdOwner = $doc->getOwner();
+        $docOwner = Docs\Utils::getUserName($docIdOwner);
 
-    $docTypeString = Docs\Utils::GetTypeString($doc);
-    if ($docStatus !== DOC_STATUS_NONE) {
-        $docTypeString .= '<br>' .
-            Loc::getMessage('TR_CA_DOCS_STATUS') .
-            Docs\Utils::GetStatusString($doc);
-    }
+        $docTypeString = Docs\Utils::GetTypeString($doc);
+        if ($docStatus !== DOC_STATUS_NONE) {
+            $docTypeString .= '<br>' .
+                Loc::getMessage('TR_CA_DOCS_STATUS') .
+                Docs\Utils::GetStatusString($doc);
+        }
 
-    $actions = array();
-    if ($docStatus === DOC_STATUS_NONE) {
-        $actions[] = array(
-            'text' => Loc::getMessage('TR_CA_DOCS_ACT_SIGN'),
-            'onclick' => "trustedCA.sign([$docId])",
-            'default' => true,
-        );
-    }
-    if ($docStatus === DOC_STATUS_BLOCKED) {
-        $actions[] = array(
-            'text' => Loc::getMessage('TR_CA_DOCS_ACT_UNBLOCK'),
-            'onclick' => "trustedCA.unblock([$docId], {$gridBuilder->reloadGridJs})",
-            'default' => false,
-        );
-    }
-
-    if ($doc->getType() === DOC_TYPE_SIGNED_FILE) {
-        $actions[] = array(
-            'text' => Loc::getMessage('TR_CA_DOCS_ACT_VERIFY'),
-            'onclick' => "trustedCA.verify([$docId])",
-            'default' => false,
-        );
-    }
-
-    $actions[] = array(
-        'text' => Loc::getMessage('TR_CA_DOCS_ACT_SEND_MAIL_TO'),
-        'onclick' => "trustedCA.promptAndSendEmail([$docId], 'MAIL_EVENT_ID_TO', {}, 'MAIL_TEMPLATE_ID_TO')",
-        'default' => false,
-    );
-
-    $actions[] = array(
-        'text' => Loc::getMessage('TR_CA_DOCS_ACT_PROTOCOL'),
-        'onclick' => "trustedCA.protocol($docId)",
-        'default' => false,
-    );
-
-    if (!empty($arResult['WORKFLOW_TEMPLATES'])) {
-        $startWorkflowActions = array();
-        foreach ($arResult['WORKFLOW_TEMPLATES'] as $workflowTemplate) {
-            $starterParams = array(
-                'moduleId' => TR_CA_DOCS_BP_MODULE_ID,
-                'entity' => Docs\WorkflowDocument::class,
-                'documentType' => 'TR_CA_DOC',
-                'documentId' => $docId,
-                'templateId' => $workflowTemplate['ID'],
-                'templateName' => $workflowTemplate['NAME'],
-                'hasParameters' => $workflowTemplate['HAS_PARAMETERS']
-            );
-            $popupMessage = Loc::getMessage('TR_CA_DOCS_POPUP_MESSAGE_1') . $workflowTemplate['NAME'] . Loc::getMessage('TR_CA_DOCS_POPUP_MESSAGE_2');
-            $startWorkflowActions[] = array(
-                'TITLE' => $workflowTemplate['DESCRIPTION'],
-                'TEXT' => $workflowTemplate['NAME'],
-                'ONCLICK' => sprintf(
-                    'BX.Bizproc.Starter.singleStart(%s, %s)',
-                    Json::encode($starterParams),
-                    $gridBuilder->reloadGridJs . ', trustedCA.showPopupMessage("' . $popupMessage . '", "check_circles", "positive")'
-                )
+        $actions = array();
+        if ($docStatus === DOC_STATUS_NONE) {
+            $actions[] = array(
+                'text' => Loc::getMessage('TR_CA_DOCS_ACT_SIGN'),
+                'onclick' => "trustedCA.sign([$docId])",
+                'default' => true,
             );
         }
-        // $actions[] = array('SEPARATOR' => true);
-        $actions[] = array(
-            'TITLE' => Loc::getMessage('TR_CA_DOCS_CRM_START_WORKFLOW'),
-            'TEXT' => Loc::getMessage('TR_CA_DOCS_CRM_START_WORKFLOW'),
-            'MENU' => $startWorkflowActions
-        );
-    }
-    if ($docIdOwner == $USER->GetID()) {
-        $actions[] = array(
-            'text' => Loc::getMessage('TR_CA_DOCS_ACT_SHARE_DOC'),
-            'onclick' => "trustedCA.promptAndShare([$docId],'SHARE_SIGN')",
-            'default' => false,
-        );
-        $actions[] = array(
-            'text' => Loc::getMessage('TR_CA_DOCS_ACT_REMOVE'),
-            'onclick' => "trustedCA.remove([$docId], false, {$gridBuilder->reloadGridJs})",
-            'default' => false,
-        );
-    } else {
-        $actions[] = array(
-            'text' => Loc::getMessage('TR_CA_DOCS_ACT_UNSHARE'),
-            'onclick' => "trustedCA.unshare([$docId], false, {$gridBuilder->reloadGridJs})",
-            'default' => false,
-        );
-    }
+        if ($docStatus === DOC_STATUS_BLOCKED) {
+            $actions[] = array(
+                'text' => Loc::getMessage('TR_CA_DOCS_ACT_UNBLOCK'),
+                'onclick' => "trustedCA.unblock([$docId], {$gridBuilder->reloadGridJs})",
+                'default' => false,
+            );
+        }
 
-    $downloadJs = "trustedCA.download([$docId], true)";
-    $docName = "<a style='cursor:pointer;' onclick='$downloadJs' ondblclick='event.stopPropagation()' title='" . Loc::getMessage('TR_CA_DOCS_DOWNLOAD_DOC') . "'>{$doc->getName()}</a>";
-    $rows[] = array(
-        'id' => $docId,
-        'columns' => array(
-            'ID' => $docId,
-            'NAME' => $docName,
-            'SIGNATURES' => $doc->getSignaturesToTable(),
-            'TYPE' => $docTypeString,
-            'OWNER' => $docOwner,
-        ),
-        'actions' => $actions,
-    );
+        if ($doc->getType() === DOC_TYPE_SIGNED_FILE) {
+            $actions[] = array(
+                'text' => Loc::getMessage('TR_CA_DOCS_ACT_VERIFY'),
+                'onclick' => "trustedCA.verify([$docId])",
+                'default' => false,
+            );
+        }
+
+        $actions[] = array(
+            'text' => Loc::getMessage('TR_CA_DOCS_ACT_SEND_MAIL_TO'),
+            'onclick' => "trustedCA.promptAndSendEmail([$docId], 'MAIL_EVENT_ID_TO', {}, 'MAIL_TEMPLATE_ID_TO')",
+            'default' => false,
+        );
+
+        $actions[] = array(
+            'text' => Loc::getMessage('TR_CA_DOCS_ACT_PROTOCOL'),
+            'onclick' => "trustedCA.protocol($docId)",
+            'default' => false,
+        );
+
+        if (!empty($arResult['WORKFLOW_TEMPLATES'])) {
+            $startWorkflowActions = array();
+            foreach ($arResult['WORKFLOW_TEMPLATES'] as $workflowTemplate) {
+                $starterParams = array(
+                    'moduleId' => TR_CA_DOCS_BP_MODULE_ID,
+                    'entity' => Docs\WorkflowDocument::class,
+                    'documentType' => 'TR_CA_DOC',
+                    'documentId' => $docId,
+                    'templateId' => $workflowTemplate['ID'],
+                    'templateName' => $workflowTemplate['NAME'],
+                    'hasParameters' => $workflowTemplate['HAS_PARAMETERS']
+                );
+                $popupMessage = Loc::getMessage('TR_CA_DOCS_POPUP_MESSAGE_1') . $workflowTemplate['NAME'] . Loc::getMessage('TR_CA_DOCS_POPUP_MESSAGE_2');
+                $startWorkflowActions[] = array(
+                    'TITLE' => $workflowTemplate['DESCRIPTION'],
+                    'TEXT' => $workflowTemplate['NAME'],
+                    'ONCLICK' => sprintf(
+                        'BX.Bizproc.Starter.singleStart(%s, %s)',
+                        Json::encode($starterParams),
+                        $gridBuilder->reloadGridJs . ', trustedCA.showPopupMessage("' . $popupMessage . '", "check_circles", "positive")'
+                    )
+                );
+            }
+            // $actions[] = array('SEPARATOR' => true);
+            $actions[] = array(
+                'TITLE' => Loc::getMessage('TR_CA_DOCS_CRM_START_WORKFLOW'),
+                'TEXT' => Loc::getMessage('TR_CA_DOCS_CRM_START_WORKFLOW'),
+                'MENU' => $startWorkflowActions
+            );
+        }
+        if ($docIdOwner == $USER->GetID()) {
+            $actions[] = array(
+                'text' => Loc::getMessage('TR_CA_DOCS_ACT_SHARE_DOC'),
+                'onclick' => "trustedCA.promptAndShare([$docId],'SHARE_SIGN')",
+                'default' => false,
+            );
+            $actions[] = array(
+                'text' => Loc::getMessage('TR_CA_DOCS_ACT_REMOVE'),
+                'onclick' => "trustedCA.remove([$docId], false, {$gridBuilder->reloadGridJs})",
+                'default' => false,
+            );
+        } else {
+            $actions[] = array(
+                'text' => Loc::getMessage('TR_CA_DOCS_ACT_UNSHARE'),
+                'onclick' => "trustedCA.unshare([$docId], false, {$gridBuilder->reloadGridJs})",
+                'default' => false,
+            );
+        }
+
+        $downloadJs = "trustedCA.download([$docId], true)";
+        $docName = "<a style='cursor:pointer;' onclick='$downloadJs' ondblclick='event.stopPropagation()' title='" . Loc::getMessage('TR_CA_DOCS_DOWNLOAD_DOC') . "'>{$doc->getName()}</a>";
+        $rows[] = array(
+            'id' => $docId,
+            'columns' => array(
+                'ID' => $docId,
+                'NAME' => $docName,
+                'SIGNATURES' => $doc->getSignaturesToTable(),
+                'TYPE' => $docTypeString,
+                'OWNER' => $docOwner,
+            ),
+            'actions' => $actions,
+        );
+    }
 }
-
 $gridBuilder->showGrid($rows);
 
 $maxSize  = Docs\Utils::maxUploadFileSize();

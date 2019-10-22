@@ -5,11 +5,11 @@ use Bitrix\Bizproc\FieldType;
 use Bitrix\Main\GroupTable;
 use Bitrix\Main\Loader;
 
-Loader::includeModule('trusted.cryptoarmdocsbp');
-if (isModuleInstalled(TR_CA_DOCS_CORE_MODULE)) {
-    Loader::includeModule(TR_CA_DOCS_CORE_MODULE);
-}
-
+// Loader::includeModule('trusted.cryptoarmdocsbp');
+// if (isModuleInstalled(TR_CA_DOCS_CORE_MODULE)) {
+//     Loader::includeShareWareModule('trusted.cryptoarmdocscrp');
+// }
+// require_once $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . "trusted.cryptoarmdocscrp" . "/classes/Utils.php";
 if (!Loader::IncludeModule('bizproc')) {
     return;
 }

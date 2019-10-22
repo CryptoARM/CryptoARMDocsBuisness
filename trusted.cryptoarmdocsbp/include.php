@@ -4,9 +4,9 @@ global $APPLICATION;
 
 require_once $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/trusted.cryptoarmdocsbp/config.php";
 
-foreach (glob(TR_CA_DOCS_BP_MODULE_DIR_CLASSES_GENERAL . "/*.php") as $filename) {
-    require_once $filename;
-}
+// foreach (glob(TR_CA_DOCS_BP_MODULE_DIR_CLASSES_GENERAL . "/*.php") as $filename) {
+//     require_once $filename;
+// }
 foreach (glob(TR_CA_DOCS_BP_MODULE_DIR_CLASSES . "/*.php") as $filename) {
     require_once $filename;
 }
