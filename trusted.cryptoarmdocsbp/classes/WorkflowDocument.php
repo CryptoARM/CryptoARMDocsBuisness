@@ -7,6 +7,8 @@ use Bitrix\Main\Loader;
 
 // Loader::includeModule('trusted.cryptoarmdocsbp');
 
+require_once $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/trusted.cryptoarmdocsbp/include.php";
+
 if (isModuleInstalled(TR_CA_DOCS_CORE_MODULE)) {
     require_once $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . TR_CA_DOCS_CORE_MODULE . "/include.php";
 }
