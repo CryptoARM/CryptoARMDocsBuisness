@@ -234,7 +234,7 @@ if (is_array($docs)){
             'columns' => array(
                 'ID' => $docId,
                 'NAME' => $docName,
-                'SIGNATURES' => $doc->getSignaturesToTable(),
+                'SIGNATURES' => $doc->getSignaturesToTable(array('time', 'name', 'org'),false),
                 'TYPE' => $docTypeString,
                 'OWNER' => $docOwner,
             ),
