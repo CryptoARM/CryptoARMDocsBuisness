@@ -222,7 +222,7 @@ if (is_array($docs)){
         } else {
             $actions[] = array(
                 'text' => Loc::getMessage('TR_CA_DOCS_ACT_UNSHARE'),
-                'onclick' => "trustedCA.unshare([$docId], false, {$gridBuilder->reloadGridJs})",
+                'onclick' => "trustedCA.unshare([$docId], null, false, {$gridBuilder->reloadGridJs})",
                 'default' => false,
             );
         }
