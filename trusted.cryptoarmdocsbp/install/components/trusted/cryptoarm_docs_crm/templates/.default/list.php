@@ -248,7 +248,8 @@ $maxSize  = Docs\Utils::maxUploadFileSize();
 $onSuccess = "() => { $('#tr_ca_form_upload').submit() }";
 $onFailure = "() => { $('#tr_ca_upload_input').val(null) }";
 $accessFileJS = "() => { trustedCA.checkAccessFile(this.files[0], $onSuccess, $onFailure) }";
-$sizeFileJS = "trustedCA.checkFileSize(this.files[0], $maxSize, $accessFileJS, $onFailure)";
+$nameFileJS = "() => {trustedCA.checkName(this.files[0], $accessFileJS, $onFailure) }";
+$sizeFileJS = "trustedCA.checkFileSize(this.files[0], $maxSize, $nameFileJS, $onFailure)";
 ob_start();
 $gridBuilder->showFilter();
 ?>
