@@ -8,7 +8,7 @@ use Trusted\CryptoARM\Docs;
 use Bitrix\Main\ModuleManager;
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/trusted.cryptoarmdocsbp/install/index.php';
-
+$APPLICATION->SetTitle("");
 if (!trusted_cryptoarmdocsbp::coreModuleInstalled()) {
     echo ShowMessage(Loc::getMessage("TR_CA_DOCS_NO_CORE_MODULE"));
     return false;
@@ -55,7 +55,7 @@ if ($USER->IsAuthorized()) {
         false
     );
 
-}
+};
 
-require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php';
+?><?php require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php';?>
 
