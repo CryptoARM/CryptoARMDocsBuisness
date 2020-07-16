@@ -17,6 +17,8 @@ if (!Loader::IncludeModule('bizproc')) {
     return;
 }
 
+Loc::loadMessages(__FILE__);
+
 class WorkflowDocument implements \IBPWorkflowDocument {
 
     public static $docType = 'TR_CA_DOC';
@@ -64,6 +66,12 @@ class WorkflowDocument implements \IBPWorkflowDocument {
             ],
             'type' => [
                 'Name' => Loc::getMessage('TR_CA_DOC_TYPE'),
+                'Type' => FieldType::STRING,
+                'Editable' => false,
+                'Required' => true,
+            ],
+            'author' => [
+                'Name' => Loc::getMessage('TR_CA_DOC_AUTHOR'),
                 'Type' => FieldType::STRING,
                 'Editable' => false,
                 'Required' => true,
@@ -150,11 +158,12 @@ class WorkflowDocument implements \IBPWorkflowDocument {
     public static function getAllowableUserGroups($documentType) {
         $dbAdminGroup = GroupTable::getById(1);
         $adminGroup = $dbAdminGroup->fetch();
-
-        return array(
+        $author = Loc::getMessage('TR_CA_DOC_AUTHOR');
+        $result = array(
             'group_1' => $adminGroup['NAME'],
-            'author' => Loc::getMessage('TR_CA_DOC_OWNER'),
+            'author' => $author,
         );
+        return $result;
     }
 
     public static function getUsersFromUserGroup($group, $id) {
