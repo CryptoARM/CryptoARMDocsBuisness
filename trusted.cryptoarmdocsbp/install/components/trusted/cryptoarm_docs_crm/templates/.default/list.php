@@ -39,8 +39,12 @@ if ($_POST['action_button_crm_docs_grid'] == 'delete') {
         }
     }
 
-    if ($idsRemove)
-        Docs\AjaxCommand::remove($idsRemove);
+    if ($idsRemove) {
+        $del = Docs\AjaxCommand::remove($idsRemove);
+        $WFDocs = json_encode($del);
+        if ($del['WFDocs']) 
+            echo "<script>trustedCA.show_messages(" . $WFDocs . ");trustedCA.reloadGrid('crm_docs_grid')</script>";
+    }
 
     if ($idsUnshare)
         Docs\AjaxCommand::unshare($idsUnshare);
@@ -242,7 +246,10 @@ if (is_array($docs)){
         );
     }
 }
-$gridBuilder->showGrid($rows);
+
+if (!$del['WFDocs']) {
+    $gridBuilder->showGrid($rows);
+};
 
 $maxSize  = Docs\Utils::maxUploadFileSize();
 $onSuccess = "() => { $('#tr_ca_form_upload').submit() }";
