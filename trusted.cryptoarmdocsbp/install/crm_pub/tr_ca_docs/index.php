@@ -34,18 +34,6 @@ if (CModule::IncludeModuleEx(TR_CA_DOCS_CORE_MODULE) == MODULE_DEMO_EXPIRED) {
 if ($USER->IsAuthorized()) {
 
     $APPLICATION->IncludeComponent(
-        'trusted:cryptoarm_docs_upload',
-        '.default',
-        array(
-            'FILES' => array('tr_ca_upload_comp_crm'),
-            'PROPS' => array(
-                'USER' => $USER->GetID(),
-            ),
-        ),
-        false
-    );
-
-    $APPLICATION->IncludeComponent(
         'trusted:cryptoarm_docs_crm',
         '.default',
         array(

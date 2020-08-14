@@ -251,10 +251,12 @@ if (!$del['WFDocs']) {
     $gridBuilder->showGrid($rows);
 };
 
+$userId = Docs\Utils::currUserId();
 $maxSize  = Docs\Utils::maxUploadFileSize();
-$onSuccess = "() => { $('#tr_ca_form_upload').submit() }";
+$onSuccess = "() => {trustedCA.reloadGrid('crm_docs_grid')}";
 $onFailure = "() => { $('#tr_ca_upload_input').val(null) }";
-$accessFileJS = "() => { trustedCA.checkAccessFile(this.files[0], $onSuccess, $onFailure) }";
+$uploadFile = "() => {trustedCA.uploadFile(this.files[0], [['USER', $userId]],$onSuccess, $onFailure)}";
+$accessFileJS = "() => { trustedCA.checkAccessFile(this.files[0], $uploadFile, $onFailure) }";
 $nameFileJS = "() => {trustedCA.checkName(this.files[0], $accessFileJS, $onFailure) }";
 $sizeFileJS = "trustedCA.checkFileSize(this.files[0], $maxSize, $nameFileJS, $onFailure)";
 ob_start();
