@@ -255,17 +255,14 @@ $userId = Docs\Utils::currUserId();
 $maxSize  = Docs\Utils::maxUploadFileSize();
 $onSuccess = "() => {trustedCA.reloadGrid('crm_docs_grid')}";
 $onFailure = "() => { $('#tr_ca_upload_input').val(null) }";
-$uploadFile = "() => {trustedCA.uploadFile(this.files[0], [['USER', $userId]],$onSuccess, $onFailure)}";
-$accessFileJS = "() => { trustedCA.checkAccessFile(this.files[0], $uploadFile, $onFailure) }";
-$nameFileJS = "() => {trustedCA.checkName(this.files[0], $accessFileJS, $onFailure) }";
-$sizeFileJS = "trustedCA.checkFileSize(this.files[0], $maxSize, $nameFileJS, $onFailure)";
+$multiUpload = "trustedCA.multipleUpload(this.files, [['USER', $userId]],$maxSize, $onSuccess, $onFailure)";
 ob_start();
 $gridBuilder->showFilter();
 ?>
 <form enctype="multipart/form-data" method="POST" id= "tr_ca_form_upload" style="margin-left: 10px;">
     <div class="ui-btn ui-btn-primary ui-btn-icon-add crm-btn-toolbar-add tr_ca_upload_wrapper">
-        <input class="tr_ca_upload_input" id= "tr_ca_upload_input" name="tr_ca_upload_comp_crm" type="file"
-               onchange="<?= $sizeFileJS ?>">
+        <input class="tr_ca_upload_input" id= "tr_ca_upload_input" name="tr_ca_upload_comp_crm[]" type="file" multiple
+               onchange="<?= $multiUpload ?>">
         <?= Loc::getMessage('TR_CA_DOCS_CRM_ADD_DOC') ?>
     </div>
 </form>
