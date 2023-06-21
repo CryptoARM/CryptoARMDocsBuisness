@@ -102,7 +102,7 @@ class CBPTrustedCAUpload
 				 'NAME' => $this->Name,
 				 'PARAMETERS' => $arParameters,
 				 'IS_INLINE' => 'N',
-				 'DOCUMENT_NAME' => $documentService->GetDocumentName($documentId)
+				 'DOCUMENT_NAME' => $documentService->getDocumentName($documentId)
 			 )
 		 );
 
@@ -311,7 +311,7 @@ class CBPTrustedCAUpload
 
 		$runtime = CBPRuntime::GetRuntime();
 		$documentService = $runtime->GetService("DocumentService");
-		$arDocumentFields = $documentService->GetDocumentFields($documentType);
+		$arDocumentFields = $documentService->getDocumentFields($documentType);
 
 		return $runtime->ExecuteResourceFile(
             __FILE__,

@@ -43,17 +43,17 @@ Class trusted_cryptoarmdocsbp extends CModule
 
         include __DIR__ . "/version.php";
 
-        if (!self::d7Support() || !self::coreModuleInstalled() || self::CoreAndModuleAreCompatible() !== "ok" ) {
+        if (!$this->d7Support() || !$this->coreModuleInstalled() || $this->CoreAndModuleAreCompatible() !== "ok" ) {
             $APPLICATION->IncludeAdminFile(
                 Loc::getMessage("MOD_INSTALL_TITLE"),
                  $DOCUMENT_ROOT . "/bitrix/modules/" . self::MODULE_ID . "/install/step_cancel.php"
             );
-        };
+        }
 
-        self::InstallFiles();
-        self::InstallMenuItems();
-        if (self::bizprocSupport()) {
-            self::InstallBPTemplates();
+        $this->InstallFiles();
+        $this->InstallMenuItems();
+        if ($this->bizprocSupport()) {
+            $this->InstallBPTemplates();
         }
         ModuleManager::registerModule(self::MODULE_ID);
     }
@@ -101,7 +101,7 @@ Class trusted_cryptoarmdocsbp extends CModule
             true, true
         );
 
-        if (self::bizprocSupport()) {
+        if ($this->bizprocSupport()) {
             CopyDirFiles(
                 $_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/" . self::MODULE_ID . "/install/activities/",
                 $_SERVER["DOCUMENT_ROOT"] . "/bitrix/activities/custom/",
@@ -130,9 +130,9 @@ Class trusted_cryptoarmdocsbp extends CModule
     }
 
     function InstallMenuItems() {
-        $siteInfo = self::getSiteInfo();
-        if (self::crmSupport()) {
-            self::AddMenuItem(
+        $siteInfo = $this->getSiteInfo();
+        if ($this->crmSupport()) {
+            $this->AddMenuItem(
                 $siteInfo["DIR"] . ".top.menu.php",
                 array(
                     Loc::getMessage('TR_CA_DOCS_CRM_MENU_TITLE'),
@@ -163,11 +163,11 @@ Class trusted_cryptoarmdocsbp extends CModule
         }
 
         if ($request["uninst"] === Loc::getMessage("MOD_UNINST_DEL")) {
-            self::UnInstallMenuItems();
-            if (self::bizprocSupport()) {
-                self::UninstallBPTemplates();
+            $this->UnInstallMenuItems();
+            if ($this->bizprocSupport()) {
+                $this->UninstallBPTemplates();
             }
-            self::UnInstallFiles();
+            $this->UnInstallFiles();
             ModuleManager::unRegisterModule(self::MODULE_ID);
         }
     }
@@ -193,10 +193,10 @@ Class trusted_cryptoarmdocsbp extends CModule
 
 
     function UnInstallMenuItems() {
-        $siteInfo = self::getSiteInfo();
+        $siteInfo = $this->getSiteInfo();
 
-        if (self::crmSupport()) {
-            self::DeleteMenuItem(
+        if ($this->crmSupport()) {
+            $this->DeleteMenuItem(
                 $siteInfo["DIR"] . ".top.menu.php",
                 $siteInfo["DIR"] . "tr_ca_docs/",
                 $siteInfo["LID"]
@@ -259,12 +259,12 @@ Class trusted_cryptoarmdocsbp extends CModule
         CModule::IncludeModule('bizprocdesigner');
 
         $templateIds = array();
-        $templateIds[] = self::ImportBPTemplateFromFile('MoneyDemand.bpt', Loc::getMessage("TR_CA_DOCS_BP_MONEY_DEMAND"));
-        $templateIds[] = self::ImportBPTemplateFromFile('Acquaintance.bpt', Loc::getMessage("TR_CA_DOCS_BP_ACQUAINTANCE"));
-        $templateIds[] = self::ImportBPTemplateFromFile('SetSignResponsibility.bpt', Loc::getMessage("TR_CA_DOCS_BP_SIGN_TEMPLATE"));
-        $templateIds[] = self::ImportBPTemplateFromFile('Order.bpt', Loc::getMessage("TR_CA_DOCS_BP_ORDER"));
-        $templateIds[] = self::ImportBPTemplateFromFile('ServiceNote.bpt', Loc::getMessage("TR_CA_DOCS_BP_SERVICE_NOTE"));
-        $templateIds[] = self::ImportBPTemplateFromFile('AgreedOn.bpt', Loc::getMessage("TR_CA_DOCS_BP_AGREED_TEMPLATE"));
+        $templateIds[] = $this->ImportBPTemplateFromFile('MoneyDemand.bpt', Loc::getMessage("TR_CA_DOCS_BP_MONEY_DEMAND"));
+        $templateIds[] = $this->ImportBPTemplateFromFile('Acquaintance.bpt', Loc::getMessage("TR_CA_DOCS_BP_ACQUAINTANCE"));
+        $templateIds[] = $this->ImportBPTemplateFromFile('SetSignResponsibility.bpt', Loc::getMessage("TR_CA_DOCS_BP_SIGN_TEMPLATE"));
+        $templateIds[] = $this->ImportBPTemplateFromFile('Order.bpt', Loc::getMessage("TR_CA_DOCS_BP_ORDER"));
+        $templateIds[] = $this->ImportBPTemplateFromFile('ServiceNote.bpt', Loc::getMessage("TR_CA_DOCS_BP_SERVICE_NOTE"));
+        $templateIds[] = $this->ImportBPTemplateFromFile('AgreedOn.bpt', Loc::getMessage("TR_CA_DOCS_BP_AGREED_TEMPLATE"));
 
         Option::set(TR_CA_DOCS_BP_MODULE_ID, TR_CA_DOCS_TEMPLATE_ID, implode(" ", $templateIds));
     }
@@ -292,7 +292,7 @@ Class trusted_cryptoarmdocsbp extends CModule
                 if ($cnt > 0) {
                     $dbResult = $DB->Query("SELECT ID FROM b_bp_workflow_instance WI WHERE WORKFLOW_TEMPLATE_ID = ".intval($id)."");
                     while ($arResult = $dbResult->Fetch()) {
-                        CBPAllTaskService::DeleteByWorkflow($arResult["ID"]);
+	                    CBPTaskService::deleteByWorkflow($arResult["ID"]);
                     }
                     $DB->Query("DELETE FROM b_bp_workflow_instance WHERE WORKFLOW_TEMPLATE_ID = ".intval($id)."");
                     $DB->Query("DELETE FROM b_bp_workflow_state WHERE WORKFLOW_TEMPLATE_ID = ".intval($id)."");

@@ -9,26 +9,26 @@ use Bitrix\Main\ModuleManager;
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/trusted.cryptoarmdocsbp/install/index.php';
 $APPLICATION->SetTitle("");
-if (!trusted_cryptoarmdocsbp::coreModuleInstalled()) {
+$trusted_cryptoarmdocsbp = new trusted_cryptoarmdocsbp();
+if (!$trusted_cryptoarmdocsbp->coreModuleInstalled()) {
     echo ShowMessage(Loc::getMessage("TR_CA_DOCS_NO_CORE_MODULE"));
     return false;
-};
-switch (trusted_cryptoarmdocsbp::CoreAndModuleAreCompatible()) {
+}
+switch ($trusted_cryptoarmdocsbp->CoreAndModuleAreCompatible()) {
     case "updateCore":
         echo ShowMessage(Loc::getMessage("TR_CA_DOCS_UPDATE_CORE_MODULE") . intval(ModuleManager::getVersion("trusted.cryptoarmdocsbp")) . Loc::getMessage("TR_CA_DOCS_UPDATE_CORE_MODULE2"));
         return false;
-        break;
     case "updateModule":
         echo ShowMessage(Loc::getMessage("TR_CA_DOCS_UPDATE_BP_MODULE"));
         return false;
+    default:
         break;
-    default:break;
-};
+}
 Loader::includeModule('trusted.cryptoarmdocsbp');
 if (CModule::IncludeModuleEx(TR_CA_DOCS_CORE_MODULE) == MODULE_DEMO_EXPIRED) {
     echo GetMessage("TR_CA_DOCS_MODULE_DEMO_EXPIRED");
     return false;
-};
+}
 
 
 if ($USER->IsAuthorized()) {
@@ -54,8 +54,6 @@ if ($USER->IsAuthorized()) {
         ),
         false
     );
+}
 
-};
-
-?><?php require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php';?>
-
+require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/footer.php';
