@@ -25,7 +25,7 @@ trustedBPSign = function() {
 
 trustedBPUpload = function () {
     let $input = $("#trca-BP-uploadFile-input");
-    let fd = new FormData;
+    let fd = new FormData();
 
     fd.append('file', $input.prop('files')[0]);
 

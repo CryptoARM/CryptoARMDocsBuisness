@@ -31,20 +31,20 @@ class WorkflowDocument implements \IBPWorkflowDocument {
         return [TR_CA_DOCS_BP_MODULE_ID, self::class, self::$docType];
     }
 
-    public static function CreateDocument($pid, $fields) {
-        $doc = Utils::CreateDocument($fields['file'], array_diff_key($fields, ['file' => true]));
+    public static function createDocument($parentDocumentId, $arFields) {
+        $doc = Utils::createDocument($arFields['file'], array_diff_key($arFields, ['file' => true]));
         return $doc->getId();
     }
 
-    public static function DeleteDocument ($id) {
-        Database::getDocumentById($id)->getLastDocument()->remove();
+    public static function deleteDocument($documentId) {
+        Database::getDocumentById($documentId)->getLastDocument()->remove();
     }
 
-    public static function GetDocument($id) {
-        return Database::getDocumentById($id)->getLastDocument()->toArray();
+    public static function getDocument($documentId) {
+        return Database::getDocumentById($documentId)->getLastDocument()->toArray();
     }
 
-    public static function GetDocumentFields($documentType) {
+    public static function getDocumentFields($documentType) {
         return [
             'id' => [
                 'Name' => 'ID',
@@ -107,8 +107,8 @@ class WorkflowDocument implements \IBPWorkflowDocument {
         return [TR_CA_DOCS_BP_MODULE_ID, self::class, $id];
     }
 
-    public static function getDocumentAdminPage($id) {
-        $doc = Database::getDocumentById($id);
+    public static function getDocumentAdminPage($documentId) {
+        $doc = Database::getDocumentById($documentId);
         if (!$doc) {
             return '';
         }
@@ -125,30 +125,30 @@ class WorkflowDocument implements \IBPWorkflowDocument {
         return true;
     }
 
-    public static function UpdateDocument($id, $arFields, $modifiedById = null) {
+    public static function updateDocument($documentId, $arFields, $modifiedById = null) {
     }
 
-    public static function PublishDocument($id) {
+    public static function publishDocument($documentId) {
         return false;
     }
 
-    public static function UnpublishDocument($id) {
+    public static function unpublishDocument($documentId) {
         return false;
     }
 
-    public static function LockDocument($id, $workflowId) {
+    public static function lockDocument($documentId, $workflowId) {
         return false;
     }
 
-    public static function UnlockDocument($id, $workflowId) {
-        $doc = Database::getDocumentById($id)->getLastDocument();
+    public static function unlockDocument($documentId, $workflowId) {
+        $doc = Database::getDocumentById($documentId)->getLastDocument();
         $doc->unblock();
         $doc->save();
         return true;
     }
 
-    public static function IsDocumentLocked($id, $workflowId) {
-        return Database::getDocumentById($id)->getLastDocument()->getStatus() == DOC_STATUS_BLOCKED;
+    public static function isDocumentLocked($documentId, $workflowId) {
+        return Database::getDocumentById($documentId)->getLastDocument()->getStatus() == DOC_STATUS_BLOCKED;
     }
 
     public static function getAllowableOperations($documentType) {
@@ -166,13 +166,13 @@ class WorkflowDocument implements \IBPWorkflowDocument {
         return $result;
     }
 
-    public static function getUsersFromUserGroup($group, $id) {
+    public static function getUsersFromUserGroup($group, $documentId) {
         $group = strtolower($group);
 
-        if ($group === 'author'){
+        if ($group === 'author') {
             // No doc id in workflow editor
-            if ($id !== self::$docType ) {
-                $doc = Database::getDocumentById($id);
+            if ($documentId !== self::$docType ) {
+                $doc = Database::getDocumentById($documentId);
                 return array($doc->getOwner());
             }
         }
@@ -185,11 +185,11 @@ class WorkflowDocument implements \IBPWorkflowDocument {
         return \CGroup::GetGroupUser($groupId);
     }
 
-    public static function GetDocumentForHistory($id, $historyIndex) {
+    public static function getDocumentForHistory($documentId, $historyIndex) {
         return false;
     }
 
-    public static function recoverDocumentFromHistory($id, $arDocument) {
+    public static function recoverDocumentFromHistory($documentId, $arDocument) {
         return false;
     }
 

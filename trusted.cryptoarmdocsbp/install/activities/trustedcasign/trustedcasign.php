@@ -132,7 +132,7 @@ class CBPTrustedCASign
         if (!is_array($arParameters))
             $arParameters = array($arParameters);
         $arParameters["DOCUMENT_ID"] = $documentId;
-        $arParameters["DOCUMENT_URL"] = $documentService->GetDocumentAdminPage($documentId);
+        $arParameters["DOCUMENT_URL"] = $documentService->getDocumentAdminPage($documentId);
         $arParameters["TaskButtonMessage"] = $this->IsPropertyExists("TaskButtonMessage") ? $this->TaskButtonMessage : GetMessage("BPAR_ACT_BUTTON2");
         if (strlen($arParameters["TaskButtonMessage"]) <= 0)
             $arParameters["TaskButtonMessage"] = GetMessage("BPAR_ACT_BUTTON2");
@@ -172,7 +172,7 @@ class CBPTrustedCASign
                 "PARAMETERS" => $arParameters,
                 'IS_INLINE' => $arParameters["ShowComment"] == "Y" ? 'N' : 'Y',
                 'DELEGATION_TYPE' => (int)$this->DelegationType,
-                'DOCUMENT_NAME' => $documentService->GetDocumentName($documentId),
+                'DOCUMENT_NAME' => $documentService->getDocumentName($documentId),
                 'DOC_ID' => $this->DocumentId,
             )
         );
@@ -701,7 +701,7 @@ class CBPTrustedCASign
             $arCurrentValues["timeout_duration_type"] = "s";
 
         $documentService = $runtime->GetService("DocumentService");
-        $arDocumentFields = $documentService->GetDocumentFields($documentType);
+        $arDocumentFields = $documentService->getDocumentFields($documentType);
 
         return $runtime->ExecuteResourceFile(
             __FILE__,
